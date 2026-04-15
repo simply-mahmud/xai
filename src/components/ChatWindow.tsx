@@ -60,7 +60,7 @@ export function ChatWindow({ messages, isLoading, onSelectPrompt, activeModel }:
 
   return (
     <div ref={scrollRef} className="flex-1 overflow-y-auto bg-gray-50/30 p-4 sm:p-6 scroll-smooth">
-      <div className="max-w-3xl mx-auto space-y-6">
+      <div id="chat-window-content" className="max-w-3xl mx-auto space-y-6">
         {messages.map((message) => (
           <MessageBubble key={message.id} message={message} />
         ))}

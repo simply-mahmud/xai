@@ -1,14 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import type { KeyboardEvent } from 'react';
-import { Send, Square } from 'lucide-react';
+import { Send, Square, Cpu } from 'lucide-react';
 
 interface ChatInputProps {
   onSend: (message: string) => void;
   disabled: boolean;
   onStop?: () => void;
+  activeModel?: string;
+  availableModels?: string[];
+  onModelChange?: (model: string) => void;
 }
 
-export function ChatInput({ onSend, disabled, onStop }: ChatInputProps) {
+export function ChatInput({ onSend, disabled, onStop, activeModel, availableModels = [], onModelChange }: ChatInputProps) {
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -46,7 +49,7 @@ export function ChatInput({ onSend, disabled, onStop }: ChatInputProps) {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={disabled && !onStop}
-          placeholder={disabled ? "Waiting for response..." : "Message Ollama (Shift+Enter for new line)"}
+          placeholder={disabled ? "Waiting for response..." : "Message Assistant of Mahmud (Shift+Enter for new line)"}
           className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-4 pr-12 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all resize-none overflow-y-auto text-[15px] placeholder-gray-400 disabled:opacity-50 min-h-[52px]"
           rows={1}
         />
@@ -70,9 +73,30 @@ export function ChatInput({ onSend, disabled, onStop }: ChatInputProps) {
         )}
       </div>
       
-      <div className="max-w-3xl mx-auto mt-2 text-center">
-        <p className="text-[11px] text-gray-400">
-          AI generated responses may be inaccurate.
+      <div className="max-w-3xl mx-auto mt-3 flex items-center justify-between text-center relative px-1">
+        {availableModels && availableModels.length > 0 ? (
+          <div className="flex items-center gap-1.5 text-gray-500 hover:text-blue-600 transition-colors bg-white border border-gray-200 hover:border-blue-200 rounded-lg px-2 py-1 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+            <Cpu size={14} />
+            <select
+              value={activeModel}
+              onChange={(e) => onModelChange && onModelChange(e.target.value)}
+              className="text-[12px] font-medium bg-transparent focus:outline-none cursor-pointer appearance-none pr-3"
+            >
+              {availableModels.map((model) => (
+                <option key={model} value={model} className="text-gray-800">
+                  {model}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute left-[calc(100%-...)] text-gray-400">
+              {/* Optional custom chevron if appearance-none hides it too much, though native works mostly fine */}
+            </div>
+          </div>
+        ) : (
+          <div />
+        )}
+        <p className="text-[11px] text-gray-400 absolute left-1/2 -translate-x-1/2 whitespace-nowrap">
+          Responds in English only · AI responses may be inaccurate.
         </p>
       </div>
     </div>
