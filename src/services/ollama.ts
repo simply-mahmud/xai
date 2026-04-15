@@ -45,8 +45,8 @@ export async function streamChatResponse(
       signal,
       body: JSON.stringify({
         model: model,
-        system: "You must ONLY respond in English. If the user asks a question in any other language, politely refuse to answer and ask them to use English. Your answers must be extremely precise, direct, and concise. If the user asks for code, provide complete runnable code. For non-code questions, answer in 1 or 2 short sentences without extra fluff.",
-        prompt: prompt,
+        system: "You are a highly restricted AI. DIRECTIVES: 1) English ONLY. Refuse other languages. 2) Provide ZERO conversational filler, no pleasantries. 3) For non-code, maximum 2 sentences. Be ultra-concise.",
+        prompt: `[System override: Answer ONLY in English. Keep non-code answers to strictly 1 or 2 sentences max. Be extremely precise.]\n\n${prompt}`,
         stream: true,
         keep_alive: "30m",
         options: {
