@@ -7,6 +7,7 @@ export interface Message {
   role: 'user' | 'assistant';
   content: string;
   responseTimeMs?: number;
+  modelName?: string;
 }
 
 interface MessageBubbleProps {
@@ -63,6 +64,24 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
 
+  const getAvatarColor = (name: string = 'assistant') => {
+    const colors = [
+      'bg-red-50 text-red-500 border-red-100',
+      'bg-emerald-50 text-emerald-500 border-emerald-100',
+      'bg-purple-50 text-purple-500 border-purple-100',
+      'bg-orange-50 text-orange-500 border-orange-100',
+      'bg-teal-50 text-teal-500 border-teal-100',
+      'bg-pink-50 text-pink-500 border-pink-100',
+      'bg-indigo-50 text-indigo-500 border-indigo-100',
+      'bg-rose-50 text-rose-500 border-rose-100',
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
+
   const handleCopyMessage = () => {
     navigator.clipboard.writeText(message.content);
     setCopied(true);
@@ -74,7 +93,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       <div className={`flex gap-3 max-w-[95%] md:max-w-[85%] lg:max-w-[75%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
         
         {/* Avatar */}
-        <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm mt-1 ${isUser ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>
+        <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm mt-1 border ${isUser ? 'bg-blue-600 text-white border-blue-700' : getAvatarColor(message.modelName)}`}>
           {isUser ? <User size={16} /> : <Bot size={18} />}
         </div>
 

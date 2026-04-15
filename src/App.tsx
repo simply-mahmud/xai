@@ -1,13 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Settings, Trash2, Bot } from 'lucide-react';
+import { Settings, Trash2, Bot, Network, FileDown } from 'lucide-react';
 import { ChatWindow } from './components/ChatWindow';
 import { ChatInput } from './components/ChatInput';
 import type { Message } from './components/MessageBubble';
 import { SettingsPanel } from './components/SettingsPanel';
 import { ConnectionStatus } from './components/ConnectionStatus';
+import { AuthScreen } from './components/AuthScreen';
 import { streamChatResponse, testConnection, DEFAULT_MODEL, fetchLocalModels } from './services/ollama';
+import { downloadChatAsGraph } from './utils/exportGraph';
+import { downloadChatAsText } from './utils/exportText';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem('xai_auth') === 'true';
+  });
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -19,6 +26,8 @@ function App() {
   const [activeModel, setActiveModel] = useState(() => {
     return localStorage.getItem('ollama_model') || DEFAULT_MODEL;
   });
+  
+  const [availableModels, setAvailableModels] = useState<string[]>([]);
 
   const [isOnline, setIsOnline] = useState<boolean | null>(null);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
@@ -33,6 +42,7 @@ function App() {
     // Auto-sync initial model if it was completely missing from the server
     if (ok) {
       const models = await fetchLocalModels(baseUrl);
+      setAvailableModels(models);
       if (models.length > 0 && !models.includes(activeModel)) {
         setActiveModel(models[0]);
         localStorage.setItem('ollama_model', models[0]);
@@ -46,6 +56,34 @@ function App() {
     const interval = setInterval(checkStatus, 30000); // Check every 30s
     return () => clearInterval(interval);
   }, [checkStatus]);
+
+  // Inactivity Auto-Lock (10 minutes)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let timeoutId: number;
+
+    const resetTimer = () => {
+      clearTimeout(timeoutId);
+      // 10 minutes = 600,000 milliseconds
+      timeoutId = window.setTimeout(() => {
+        setIsAuthenticated(false);
+        sessionStorage.removeItem('xai_auth');
+      }, 600000);
+    };
+
+    resetTimer();
+
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    const handleActivity = () => resetTimer();
+
+    events.forEach(event => document.addEventListener(event, handleActivity, { passive: true }));
+
+    return () => {
+      clearTimeout(timeoutId);
+      events.forEach(event => document.removeEventListener(event, handleActivity));
+    };
+  }, [isAuthenticated]);
 
   const handleSaveSettings = (newUrl: string, newModel: string) => {
     setBaseUrl(newUrl);
@@ -71,7 +109,7 @@ function App() {
       // Initialize an empty assistant message placeholder
       setMessages((prev) => [
         ...prev, 
-        { id: assistantId, role: 'assistant', content: '', responseTimeMs: undefined }
+        { id: assistantId, role: 'assistant', content: '', responseTimeMs: undefined, modelName: activeModel }
       ]);
       
       let fullResponse = '';
@@ -107,7 +145,8 @@ function App() {
       const errorMsg: Message = { 
         id: (Date.now() + 1).toString(), 
         role: 'assistant', 
-        content: `Error: ${error.message || 'Failed to communicate with Ollama.'}` 
+        content: `Error: ${error.message || 'Failed to communicate with Ollama.'}`,
+        modelName: activeModel
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
@@ -127,6 +166,13 @@ function App() {
       setMessages([]);
     }
   };
+
+  if (!isAuthenticated) {
+    return <AuthScreen onUnlock={() => {
+      sessionStorage.setItem('xai_auth', 'true');
+      setIsAuthenticated(true);
+    }} />;
+  }
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 font-sans">
@@ -157,9 +203,27 @@ function App() {
           <div className="h-6 w-px bg-gray-200 hidden sm:block"></div>
           
           <button 
+            onClick={() => downloadChatAsGraph(messages)}
+            disabled={messages.length === 0 || isLoading}
+            className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors disabled:opacity-50"
+            title="Download Interactive Graph"
+          >
+            <Network size={18} />
+          </button>
+
+          <button 
+            onClick={() => downloadChatAsText(messages)}
+            disabled={messages.length === 0 || isLoading}
+            className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors disabled:opacity-50"
+            title="Download Text File"
+          >
+            <FileDown size={18} />
+          </button>
+
+          <button 
             onClick={handleClearChat}
             disabled={messages.length === 0}
-            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:hover:text-gray-400 disabled:hover:bg-transparent"
+            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
             title="Clear Chat"
           >
             <Trash2 size={18} />
@@ -175,18 +239,26 @@ function App() {
       </header>
 
       {/* Main Chat Area */}
-      <ChatWindow 
-        messages={messages} 
-        isLoading={isLoading} 
-        onSelectPrompt={handleSendMessage}
-        activeModel={activeModel}
-      />
+      <div id="chat-window-content" className="flex-1 overflow-hidden flex flex-col bg-gray-50">
+        <ChatWindow 
+          messages={messages} 
+          isLoading={isLoading} 
+          onSelectPrompt={handleSendMessage}
+          activeModel={activeModel}
+        />
+      </div>
 
       {/* Input Area */}
       <ChatInput 
         onSend={handleSendMessage} 
         disabled={isLoading} 
-        onStop={handleStopGeneration} 
+        onStop={handleStopGeneration}
+        activeModel={activeModel}
+        availableModels={availableModels}
+        onModelChange={(model) => {
+          setActiveModel(model);
+          localStorage.setItem('ollama_model', model);
+        }}
       />
 
       {/* Settings Modal */}
