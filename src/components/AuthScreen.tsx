@@ -16,10 +16,9 @@ export function AuthScreen({ onUnlock }: AuthScreenProps) {
     setMounted(true);
   }, []);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    // The password defaults to "mahmud" unless changed in .env
     const CORRECT_PASSWORD = import.meta.env.VITE_APP_PASSWORD || 'mahmud';
     
     if (password === CORRECT_PASSWORD) {
@@ -27,7 +26,7 @@ export function AuthScreen({ onUnlock }: AuthScreenProps) {
       setIsUnlocking(true);
       setTimeout(() => {
         onUnlock();
-      }, 1000); // 1 second dramatic exit
+      }, 1000);
     } else {
       setError(true);
       setTimeout(() => setError(false), 2000);
@@ -63,7 +62,7 @@ export function AuthScreen({ onUnlock }: AuthScreenProps) {
 
         {/* Auth Form */}
         <form onSubmit={handleSubmit} className="w-full relative">
-          <div className={`transform transition-all duration-300`}> 
+          <div className="transform transition-all duration-300">
             <div className="relative flex items-center">
               <div className="absolute left-4 text-gray-400">
                 {isUnlocking ? <Unlock size={20} className="text-green-400" /> : <Lock size={20} />}
