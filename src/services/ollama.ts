@@ -45,7 +45,7 @@ export async function streamChatResponse(
       signal,
       body: JSON.stringify({
         model: model,
-        system: "If the user asks for code, return complete runnable code with all needed parts. For non-code questions, answer in 1 or 2 short sentences only. Be direct. Do not add extra explanation unless asked.",
+        system: "You must ONLY respond in English. If the user asks a question in any other language, politely refuse to answer and ask them to use English. Your answers must be extremely precise, direct, and concise. If the user asks for code, provide complete runnable code. For non-code questions, answer in 1 or 2 short sentences without extra fluff.",
         prompt: prompt,
         stream: true,
         keep_alive: "30m",
