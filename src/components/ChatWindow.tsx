@@ -43,7 +43,7 @@ export function ChatWindow({ messages, isLoading, onSelectPrompt, activeModel }:
             <button
               key={i}
               onClick={() => onSelectPrompt(prompt.text)}
-              className="bg-white p-3.5 sm:p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all text-left group flex flex-col gap-2.5 sm:gap-3 min-h-[90px] sm:min-h-[100px]"
+              className={`bg-white p-3.5 sm:p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all text-left group flex flex-col gap-2.5 sm:gap-3 min-h-[90px] sm:min-h-[100px] ${i === 2 ? 'hidden md:flex' : ''}`}
             >
               <div className="bg-gray-50 w-8 h-8 rounded-lg flex items-center justify-center group-hover:bg-blue-50 transition-colors">
                 {prompt.icon}

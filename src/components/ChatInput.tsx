@@ -49,9 +49,9 @@ export function ChatInput({ onSend, disabled, onStop, activeModel, availableMode
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={disabled && !onStop}
-          placeholder={disabled ? "Waiting for response..." : "Message Assistant of Mahmud (Shift+Enter for new line)"}
-          className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-4 pr-12 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all resize-none overflow-y-auto text-base sm:text-[15px] placeholder-gray-400 disabled:opacity-50 min-h-[52px]"
-          rows={1}
+          placeholder={disabled ? "Waiting for response..." : "Message Assistant of Mahmud\n(Shift+Enter for new line)"}
+          className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all resize-none overflow-y-auto text-base sm:text-[15px] placeholder:text-[13px] sm:placeholder:text-[14px] placeholder-gray-400 disabled:opacity-50 min-h-[68px] sm:min-h-[64px]"
+          rows={2}
         />
         
         {disabled && onStop ? (
