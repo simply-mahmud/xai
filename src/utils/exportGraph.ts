@@ -4,6 +4,7 @@ export function downloadChatAsGraph(messages: Message[]) {
   if (messages.length === 0) return;
 
   let mermaidStr = 'graph TD\n';
+  mermaidStr += '  classDef default fill:#0f172a,stroke:#334155,stroke-width:2px,color:#f8fafc,rx:12,ry:12;\n';
   
   for (let i = 0; i < messages.length; i++) {
     const msg = messages[i];
@@ -12,25 +13,31 @@ export function downloadChatAsGraph(messages: Message[]) {
       .replace(/"/g, "'")
       .replace(/[\n\r]+/g, " ")
       .replace(/[<>{}()]/g, "") // remove characters that break mermaid syntax
-      .substring(0, 60) + (msg.content.length > 60 ? '...' : '');
+      .substring(0, 70) + (msg.content.length > 70 ? '...' : '');
       
     const nodeId = `msg_${i}`;
     let nodeLabel = '';
     
+    // Using (...) creates rounded rectangle nodes
     if (msg.role === 'user') {
       nodeLabel = `User: ${safeContent}`;
-      mermaidStr += `  ${nodeId}["👤 ${nodeLabel}"]\n`;
-      mermaidStr += `  style ${nodeId} fill:#2563eb,stroke:#1e40af,color:#fff,stroke-width:2px,border-radius:8px\n`;
+      mermaidStr += `  ${nodeId}("👤 ${nodeLabel}")\n`;
+      // Vibrant blue for user
+      mermaidStr += `  style ${nodeId} fill:#2563eb,stroke:#93c5fd,color:#ffffff,stroke-width:2px\n`;
     } else {
       nodeLabel = `xAI (${msg.modelName || 'agent'}): ${safeContent}`;
-      mermaidStr += `  ${nodeId}["🤖 ${nodeLabel}"]\n`;
-      mermaidStr += `  style ${nodeId} fill:#1e293b,stroke:#475569,color:#fff,stroke-width:2px,border-radius:8px\n`;
+      mermaidStr += `  ${nodeId}("🤖 ${nodeLabel}")\n`;
+      // Deep purple/slate for AI
+      mermaidStr += `  style ${nodeId} fill:#1e1b4b,stroke:#a855f7,color:#ffffff,stroke-width:2px\n`;
     }
     
     if (i > 0) {
       mermaidStr += `  msg_${i-1} --> ${nodeId}\n`;
     }
   }
+  
+  // Custom link styles for connections
+  mermaidStr += `  linkStyle default stroke:#64748b,stroke-width:2px,fill:none;\n`;
 
   // Self-contained HTML file using Mermaid
   const htmlContent = `<!DOCTYPE html>
@@ -41,42 +48,106 @@ export function downloadChatAsGraph(messages: Message[]) {
   <title>xAI Conversation Graph</title>
   <style>
     body {
-      background-color: #0f172a;
+      background-color: #030712;
       color: white;
-      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px;
+      padding: 0;
       margin: 0;
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -20%; left: -10%;
+      width: 600px; height: 600px;
+      background: rgba(37, 99, 235, 0.15);
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: -1;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -20%; right: -10%;
+      width: 600px; height: 600px;
+      background: rgba(147, 51, 234, 0.15);
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: -1;
+    }
+    .header {
+      width: 100%;
+      padding: 25px 0;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      margin-bottom: 40px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
     }
     h1 {
-      font-size: 1.5rem;
-      margin-bottom: 30px;
-      background: linear-gradient(to right, #60a5fa, #c084fc);
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin: 0;
+      background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6);
       -webkit-background-clip: text;
       color: transparent;
     }
-    .mermaid {
-      background: #0b0f19;
+    p.subtitle {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-top: 8px;
+      margin-bottom: 0px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .mermaid-wrapper {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(20px);
       padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      border: 1px solid #1e293b;
-      max-width: 100%;
+      border-radius: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
+      max-width: 90vw;
+      width: auto;
       overflow: auto;
+      margin-bottom: 60px;
+      transition: transform 0.3s ease;
+    }
+    .mermaid-wrapper:hover {
+      box-shadow: 0 35px 60px -15px rgba(168, 85, 247, 0.2), inset 0 0 0 1px rgba(255,255,255,0.1);
+    }
+    svg {
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
     }
   </style>
 </head>
 <body>
-  <h1>xAI Conversation Graph</h1>
-  <div class="mermaid">
+  <div class="header">
+    <h1>xAI Network Node</h1>
+    <p class="subtitle">Interactive Dialogue Blueprint</p>
+  </div>
+  <div class="mermaid-wrapper">
+    <div class="mermaid">
 ${mermaidStr}
+    </div>
   </div>
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+    mermaid.initialize({ 
+      startOnLoad: true, 
+      theme: 'dark', 
+      securityLevel: 'loose',
+      fontFamily: 'Inter, ui-sans-serif, system-ui'
+    });
   </script>
 </body>
 </html>`;

@@ -20,7 +20,22 @@ function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
   const [baseUrl, setBaseUrl] = useState(() => {
-    return localStorage.getItem('ollama_base_url') || import.meta.env.VITE_OLLAMA_BASE_URL || 'http://192.168.0.113:11434';
+    const cachedLocal = localStorage.getItem('ollama_base_url');
+    const envUrl = import.meta.env.VITE_OLLAMA_BASE_URL;
+    const fallbackUrl = 'http://192.168.0.113:11434';
+    
+    // Prevent Mixed Content blocks: browsers block http:// IP requests from https:// websites.
+    if (window.location.protocol === 'https:') {
+      // If we have an env config for HTTPS, always prefer it if cached is insecure
+      if (cachedLocal && cachedLocal.startsWith('http://') && !cachedLocal.includes('localhost')) {
+        return envUrl || fallbackUrl;
+      }
+      if (!cachedLocal && envUrl) {
+        return envUrl;
+      }
+    }
+    
+    return cachedLocal || envUrl || fallbackUrl;
   });
 
   const [activeModel, setActiveModel] = useState(() => {
@@ -177,63 +192,65 @@ function App() {
   return (
     <div className="flex flex-col h-screen bg-gray-50 font-sans">
       {/* Header */}
-      <header className="bg-white border-b border-gray-100 px-4 sm:px-6 py-3 flex items-center justify-between shrink-0 shadow-sm z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-sm">
-            <Bot size={20} />
+      <header className="bg-white border-b border-gray-100 px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between shrink-0 shadow-sm z-10 w-full overflow-hidden">
+        <div className="flex flex-1 items-center gap-2 sm:gap-3 min-w-0 mr-2">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-sm shrink-0">
+            <Bot size={18} className="sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="font-semibold text-gray-800 text-lg leading-tight px-0">xAI</h1>
-              <div className="flex items-center gap-1 bg-gradient-to-r from-gray-50 to-white border border-gray-200 px-2.5 py-0.5 rounded-full shadow-sm hover:shadow-md transition-all cursor-default group">
+          <div className="min-w-0 flex flex-col justify-center">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <h1 className="font-semibold text-gray-800 text-base sm:text-lg leading-tight px-0">xAI</h1>
+              <div className="hidden sm:flex items-center gap-1 bg-gradient-to-r from-gray-50 to-white border border-gray-200 px-2.5 py-0.5 rounded-full shadow-sm hover:shadow-md transition-all cursor-default group">
                 <span className="text-[10px] text-gray-500 font-medium">Built with</span>
                 <span className="text-[10px] inline-block animate-pulse group-hover:animate-bounce">❤️</span>
                 <span className="text-[10px] font-bold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent">Mahmud</span>
               </div>
             </div>
-            <p className="text-[11px] text-gray-500 font-medium tracking-wide">
+            <p className="text-[9px] sm:text-[11px] text-gray-500 font-medium tracking-wide truncate max-w-[120px] sm:max-w-[200px]">
               MODEL: <span className="text-blue-600 font-semibold uppercase">{activeModel}</span>
             </p>
           </div>
         </div>
         
-        <div className="flex items-center gap-3">
-          <ConnectionStatus isOnline={isOnline} isChecking={isCheckingStatus} />
+        <div className="flex items-center gap-1 sm:gap-3 shrink-0">
+          <div className="hidden sm:block">
+            <ConnectionStatus isOnline={isOnline} isChecking={isCheckingStatus} />
+          </div>
           
           <div className="h-6 w-px bg-gray-200 hidden sm:block"></div>
           
           <button 
             onClick={() => downloadChatAsGraph(messages)}
             disabled={messages.length === 0 || isLoading}
-            className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors disabled:opacity-50"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors disabled:opacity-50"
             title="Download Interactive Graph"
           >
-            <Network size={18} />
+            <Network size={16} className="sm:w-[18px] sm:h-[18px]" />
           </button>
 
           <button 
             onClick={() => downloadChatAsText(messages)}
             disabled={messages.length === 0 || isLoading}
-            className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors disabled:opacity-50"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors disabled:opacity-50"
             title="Download Text File"
           >
-            <FileDown size={18} />
+            <FileDown size={16} className="sm:w-[18px] sm:h-[18px]" />
           </button>
 
           <button 
             onClick={handleClearChat}
             disabled={messages.length === 0}
-            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
             title="Clear Chat"
           >
-            <Trash2 size={18} />
+            <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
           </button>
           <button 
             onClick={() => setIsSettingsOpen(true)}
-            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
             title="Settings"
           >
-            <Settings size={18} />
+            <Settings size={16} className="sm:w-[18px] sm:h-[18px]" />
           </button>
         </div>
       </header>

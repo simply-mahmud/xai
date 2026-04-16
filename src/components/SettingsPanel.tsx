@@ -59,7 +59,7 @@ export function SettingsPanel({ isOpen, onClose, baseUrl, activeModel, onSave }:
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in-up">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
             <Server size={18} className="text-blue-500" />
             Connection & Model Settings
@@ -73,7 +73,7 @@ export function SettingsPanel({ isOpen, onClose, baseUrl, activeModel, onSave }:
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-5">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Ollama API Base URL
@@ -88,6 +88,16 @@ export function SettingsPanel({ isOpen, onClose, baseUrl, activeModel, onSave }:
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
               placeholder="http://192.168.0.113:11434"
             />
+            
+            {typeof window !== 'undefined' && window.location.protocol === 'https:' && localUrl.startsWith('http://') && !localUrl.includes('localhost') && (
+              <div className="flex items-start gap-1.5 mt-2 bg-amber-50 text-amber-700 p-2.5 rounded-lg border border-amber-200/60">
+                <AlertCircle size={14} className="mt-0.5 shrink-0" />
+                <p className="text-xs leading-relaxed font-medium">
+                  Browsers block HTTP requests from HTTPS sites (Mixed Content). This Local IP won't work here. Use an HTTPS backend URL (like a Cloudflare Tunnel).
+                </p>
+              </div>
+            )}
+
             <p className="text-xs text-gray-500 leading-relaxed mt-1">
               Currently pointing to your local network. Update this if you're using a public URL (like Cloudflare Tunnel).
             </p>
@@ -151,7 +161,7 @@ export function SettingsPanel({ isOpen, onClose, baseUrl, activeModel, onSave }:
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
+        <div className="bg-gray-50 px-4 sm:px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
           <button
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
