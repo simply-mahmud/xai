@@ -53,7 +53,7 @@ const CodeBlock = ({ inline, className, children, ...props }: any) => {
           {copied ? 'Copied!' : 'Copy Code'}
         </button>
       </div>
-      <div className="p-4 overflow-x-auto text-[13.5px] leading-[1.65] font-mono text-gray-800 break-normal whitespace-pre">
+      <div className="p-3 sm:p-4 overflow-x-auto text-[13px] sm:text-[13.5px] leading-[1.65] font-mono text-gray-800 break-normal whitespace-pre">
         <code {...props}>{children}</code>
       </div>
     </div>
@@ -93,13 +93,13 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       <div className={`flex gap-3 max-w-[95%] md:max-w-[85%] lg:max-w-[75%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
         
         {/* Avatar */}
-        <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm mt-1 border ${isUser ? 'bg-blue-600 text-white border-blue-700' : getAvatarColor(message.modelName)}`}>
-          {isUser ? <User size={16} /> : <Bot size={18} />}
+        <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-sm mt-1 border ${isUser ? 'bg-blue-600 text-white border-blue-700' : getAvatarColor(message.modelName)}`}>
+          {isUser ? <User size={14} className="sm:w-[16px] sm:h-[16px]" /> : <Bot size={16} className="sm:w-[18px] sm:h-[18px]" />}
         </div>
 
         {/* Bubble */}
         <div className="group relative min-w-0">
-          <div className={`px-5 py-3.5 rounded-2xl shadow-sm text-[15px] leading-relaxed break-words ${
+          <div className={`px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl shadow-sm text-[15px] leading-relaxed break-words ${
             isUser 
               ? 'bg-blue-600 text-white rounded-tr-sm whitespace-pre-wrap' 
               : 'bg-white border border-gray-200/60 text-gray-800 rounded-tl-sm'

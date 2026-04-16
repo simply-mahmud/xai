@@ -50,7 +50,7 @@ export function ChatInput({ onSend, disabled, onStop, activeModel, availableMode
           onKeyDown={handleKeyDown}
           disabled={disabled && !onStop}
           placeholder={disabled ? "Waiting for response..." : "Message Assistant of Mahmud (Shift+Enter for new line)"}
-          className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-4 pr-12 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all resize-none overflow-y-auto text-[15px] placeholder-gray-400 disabled:opacity-50 min-h-[52px]"
+          className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-4 pr-12 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all resize-none overflow-y-auto text-base sm:text-[15px] placeholder-gray-400 disabled:opacity-50 min-h-[52px]"
           rows={1}
         />
         
@@ -73,29 +73,36 @@ export function ChatInput({ onSend, disabled, onStop, activeModel, availableMode
         )}
       </div>
       
-      <div className="max-w-3xl mx-auto mt-3 flex items-center justify-between text-center relative px-1">
-        {availableModels && availableModels.length > 0 ? (
-          <div className="flex items-center gap-1.5 text-gray-500 hover:text-blue-600 transition-colors bg-white border border-gray-200 hover:border-blue-200 rounded-lg px-2 py-1 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-            <Cpu size={14} />
-            <select
-              value={activeModel}
-              onChange={(e) => onModelChange && onModelChange(e.target.value)}
-              className="text-[12px] font-medium bg-transparent focus:outline-none cursor-pointer appearance-none pr-3"
-            >
-              {availableModels.map((model) => (
-                <option key={model} value={model} className="text-gray-800">
-                  {model}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute left-[calc(100%-...)] text-gray-400">
-              {/* Optional custom chevron if appearance-none hides it too much, though native works mostly fine */}
+      <div className="max-w-3xl mx-auto mt-2 flex flex-col-reverse sm:flex-row items-center justify-between gap-2 sm:gap-0 px-1">
+        <div className="flex items-center justify-center gap-2 w-full sm:w-auto">
+          {availableModels && availableModels.length > 0 && (
+            <div className="flex flex-shrink-0 items-center justify-between max-w-[140px] sm:max-w-none text-gray-500 hover:text-blue-600 transition-colors bg-white border border-gray-200 hover:border-blue-200 rounded-lg px-2 py-1 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <Cpu size={14} className="flex-shrink-0" />
+                <select
+                  value={activeModel}
+                  onChange={(e) => onModelChange && onModelChange(e.target.value)}
+                  className="text-[12px] font-medium bg-transparent focus:outline-none cursor-pointer appearance-none pr-2 truncate"
+                >
+                  {availableModels.map((model) => (
+                    <option key={model} value={model} className="text-gray-800">
+                      {model}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
+          )}
+
+          {/* Builder Badge (Mobile Only) */}
+          <div className="flex sm:hidden items-center gap-1 bg-gradient-to-r from-gray-50 to-white border border-gray-200 px-2.5 py-[3px] rounded-full shadow-[0_1px_2px_rgba(0,0,0,0.02)] cursor-default group shrink-0">
+            <span className="text-[10px] text-gray-500 font-medium">Built with</span>
+            <span className="text-[10px] inline-block animate-pulse group-hover:animate-bounce">❤️</span>
+            <span className="text-[10px] font-bold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent">Mahmud</span>
           </div>
-        ) : (
-          <div />
-        )}
-        <p className="text-[11px] text-gray-400 absolute left-1/2 -translate-x-1/2 whitespace-nowrap">
+        </div>
+        
+        <p className="text-[10px] sm:text-[11px] text-gray-400 whitespace-nowrap">
           Responds in English only · AI responses may be inaccurate.
         </p>
       </div>

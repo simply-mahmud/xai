@@ -27,14 +27,14 @@ export function ChatWindow({ messages, isLoading, onSelectPrompt, activeModel }:
 
   if (messages.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-6 bg-gray-50/50">
-        <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center mb-6 animate-fade-in-up">
-          <Bot size={32} className="text-blue-600" />
+      <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 bg-gray-50/50">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center mb-5 sm:mb-6 animate-fade-in-up">
+          <Bot className="text-blue-600 w-8 h-8 sm:w-10 sm:h-10" />
         </div>
-        <h2 className="text-2xl font-semibold text-gray-800 mb-2 animate-fade-in-up" style={{animationDelay: '100ms'}}>
+        <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2 animate-fade-in-up" style={{animationDelay: '100ms'}}>
           How can I help you today?
         </h2>
-        <p className="text-gray-500 text-sm mb-8 max-w-md text-center leading-relaxed animate-fade-in-up" style={{animationDelay: '200ms'}}>
+        <p className="text-gray-500 text-[13px] sm:text-sm mb-6 sm:mb-8 max-w-md text-center leading-relaxed animate-fade-in-up" style={{animationDelay: '200ms'}}>
           Connected to local Ollama ({activeModel}). Note: Initial response might take a few seconds as the model loads into memory.
         </p>
 
@@ -43,12 +43,12 @@ export function ChatWindow({ messages, isLoading, onSelectPrompt, activeModel }:
             <button
               key={i}
               onClick={() => onSelectPrompt(prompt.text)}
-              className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all text-left group flex flex-col gap-3 min-h-[100px]"
+              className="bg-white p-3.5 sm:p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all text-left group flex flex-col gap-2.5 sm:gap-3 min-h-[90px] sm:min-h-[100px]"
             >
               <div className="bg-gray-50 w-8 h-8 rounded-lg flex items-center justify-center group-hover:bg-blue-50 transition-colors">
                 {prompt.icon}
               </div>
-              <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700 transition-colors">
+              <span className="text-[13px] sm:text-sm font-medium text-gray-700 group-hover:text-blue-700 transition-colors flex-1">
                 {prompt.text}
               </span>
             </button>
@@ -68,10 +68,10 @@ export function ChatWindow({ messages, isLoading, onSelectPrompt, activeModel }:
         {isLoading && (
           <div className="flex justify-start animate-fade-in-up">
             <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 shadow-sm">
-                <Bot size={18} />
+              <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 shadow-sm mt-1">
+                <Bot size={16} className="sm:w-[18px] sm:h-[18px]" />
               </div>
-              <div className="bg-white border border-gray-100 px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-1.5">
+              <div className="bg-white border border-gray-100 px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-1.5 h-[44px] sm:h-[50px]">
                 <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}} />
                 <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}} />
                 <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}} />
