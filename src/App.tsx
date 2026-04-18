@@ -186,6 +186,9 @@ function App() {
     return <AuthScreen onUnlock={() => {
       sessionStorage.setItem('xai_auth', 'true');
       setIsAuthenticated(true);
+      
+      // Silently warm up the model so the next message is fast
+      streamChatResponse('hi', activeModel, baseUrl, () => {}, new AbortController().signal).catch(() => {});
     }} />;
   }
 
