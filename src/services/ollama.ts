@@ -1,4 +1,4 @@
-export const DEFAULT_MODEL = 'dolphin-phi';
+export const DEFAULT_MODEL = 'qwen2.5:1.5b';
 
 /**
  * Validates the connection to the Ollama server.
